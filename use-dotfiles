@@ -1,0 +1,7 @@
+mv ~/.tmux.conf ~/.tmux.orig
+mv ~/.zshrc ~/.zshrc.orig
+mv ~/.vimrc  ~/.vimrc.orig
+
+cp .tmux.conf ~/.tmux.conf
+cp .zshrc ~/.zshrc
+cp .vimrc ~/.vimrc
