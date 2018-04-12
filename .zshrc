@@ -29,7 +29,7 @@ export ZSH=/Users/darelle/.oh-my-zsh
 ZSH_THEME="powerlevel9k/powerlevel9k"
 
 # zsh tmux settings
-ZSH_TMUX_AUTOSTART='true'
+ZSH_TMUX_AUTOSTART='false'
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -555,3 +555,12 @@ fi
 # Source functions and aliases.
 [[ -f ~/.zsh_functions ]] && source ~/.zsh_functions
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
+
+# Lines configured by zsh-newuser-install
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/Users/darelle/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
