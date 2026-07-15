@@ -1,3 +1,26 @@
-cp ~/.tmux.conf .tmux.conf
-cp ~/.zshrc .zshrc
-cp ~/.vimrc .vimrc
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+copy_file() {
+  local source_path="$1"
+  local target_path="$2"
+  mkdir -p "$(dirname "${target_path}")"
+  cp -p "${source_path}" "${target_path}"
+  printf 'updated: %s\n' "${target_path}"
+}
+
+copy_file "${HOME}/.zshrc" "${ROOT_DIR}/zsh/.zshrc"
+copy_file "${HOME}/.zprofile" "${ROOT_DIR}/zsh/.zprofile"
+copy_file "${HOME}/.p10k.zsh" "${ROOT_DIR}/zsh/.p10k.zsh"
+copy_file "${HOME}/.tmux.conf" "${ROOT_DIR}/tmux/.tmux.conf"
+copy_file "${HOME}/.vimrc" "${ROOT_DIR}/vim/.vimrc"
+copy_file "${HOME}/.vim/shared.vim" "${ROOT_DIR}/vim/.vim/shared.vim"
+copy_file "${HOME}/.config/nvim/init.vim" "${ROOT_DIR}/nvim/init.vim"
+copy_file "${HOME}/.config/nvim/lua/plugins.lua" "${ROOT_DIR}/nvim/lua/plugins.lua"
+copy_file "${HOME}/.config/nvim/lua/ide.lua" "${ROOT_DIR}/nvim/lua/ide.lua"
+copy_file "${HOME}/.config/nvim/lua/lsp.lua" "${ROOT_DIR}/nvim/lua/lsp.lua"
+copy_file "${HOME}/.gitignore_global" "${ROOT_DIR}/git/.gitignore_global"
+
+printf '\nReview git diff and run scripts/secret-scan.sh before committing.\n'

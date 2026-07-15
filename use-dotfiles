@@ -1,7 +1,4 @@
-mv ~/.tmux.conf ~/.tmux.orig
-mv ~/.zshrc ~/.zshrc.orig
-mv ~/.vimrc  ~/.vimrc.orig
+#!/usr/bin/env bash
+set -euo pipefail
 
-cp .tmux.conf ~/.tmux.conf
-cp .zshrc ~/.zshrc
-cp .vimrc ~/.vimrc
+"$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/install.sh"
