@@ -1,0 +1,13 @@
+[user]
+	name = Your Name
+	email = you@example.com
+
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+[core]
+	excludesfile = ~/.gitignore_global
+
+# Optional: keep work/project-specific identity outside the public dotfiles repo.
+# [includeIf "gitdir:~/Developer/Projects/work-project/"]
+# 	path = ~/.gitconfig-work
