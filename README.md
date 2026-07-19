@@ -9,7 +9,7 @@ This repo intentionally tracks reproducible configuration only. It does not trac
 - Zsh and Powerlevel10k config
 - tmux config
 - Vim shared config
-- Neovim IDE config with lazy.nvim, Neo-tree, LSP, Mason, completion, and Treesitter
+- Neovim IDE config with lazy.nvim, Neo-tree, LSP, Mason, completion, Treesitter, and Git change signs
 - Git ignore defaults and a safe `.gitconfig.example`
 - Homebrew `Brewfile`
 - Backup-then-symlink installer
