@@ -106,7 +106,13 @@ local servers = {
 local ok_mason_lsp, mason_lspconfig = pcall(require, "mason-lspconfig")
 if ok_mason_lsp then
   mason_lspconfig.setup({
-    ensure_installed = servers,
+    ensure_installed = {
+      "lua_ls",
+      "ts_ls",
+      "gopls",
+      "jsonls",
+      "yamlls",
+    },
     automatic_enable = false,
   })
 end

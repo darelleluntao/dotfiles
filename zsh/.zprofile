@@ -1,5 +1,7 @@
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if command -v brew >/dev/null 2>&1; then
+  eval "$(brew shellenv)"
+fi
 
 
 # Added by Antigravity CLI installer
-export PATH="/Users/darelleluntao/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"

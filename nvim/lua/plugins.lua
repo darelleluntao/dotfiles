@@ -30,6 +30,17 @@ require("lazy").setup({
   { "L3MON4D3/LuaSnip" },
   { "saadparwaiz1/cmp_luasnip" },
   { "lewis6991/gitsigns.nvim" },
+  {
+    "nvim-telescope/telescope.nvim",
+    branch = "master",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    },
+    config = function()
+      require("ide").telescope()
+    end,
+  },
 }, {
   checker = { enabled = true, notify = false },
   change_detection = { notify = false },

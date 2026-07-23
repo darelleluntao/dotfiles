@@ -12,6 +12,8 @@ This repo intentionally tracks reproducible configuration only. It does not trac
 - Neovim IDE config with lazy.nvim, Neo-tree, LSP, Mason, completion, Treesitter, and Git change signs
 - Git ignore defaults and a safe `.gitconfig.example`
 - Homebrew `Brewfile`
+- Herdr pane/session configuration and helper scripts
+- OMP plugin manifest and enabled-plugin lockfile (runtime state is excluded)
 - Backup-then-symlink installer
 
 ## Install on a new machine
@@ -46,3 +48,5 @@ Only commit after reviewing the diff and confirming no machine secrets are prese
 - Edit `~/.gitconfig` from `git/.gitconfig.example`.
 - Install tmux plugins with `prefix + I` after launching tmux.
 - Open Neovim and run `:Lazy sync`, `:Mason`, and `:checkhealth vim.lsp` if needed.
+- After installing OMP, run `bun install --cwd ~/.omp/plugins` to install the tracked plugin manifest.
+- Herdr helper scripts require the `herdr` CLI, Python 3, and macOS System Events access.

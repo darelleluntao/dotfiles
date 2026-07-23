@@ -190,11 +190,14 @@ nnoremap ]l :lnext<CR>
 nnoremap [l :lprevious<CR>
 
 " fzf integration when available. Homebrew's fzf plugin provides :FZF.
-if executable('fzf') && filereadable('/opt/homebrew/opt/fzf/plugin/fzf.vim')
-  set runtimepath+=/opt/homebrew/opt/fzf
-  runtime plugin/fzf.vim
-  nnoremap <leader>f :FZF<CR>
-  nnoremap <leader>b :buffers<CR>:buffer<Space>
+if executable('fzf') && executable('brew')
+  let s:fzf_root = trim(system('brew --prefix fzf'))
+  if filereadable(s:fzf_root . '/plugin/fzf.vim')
+    execute 'set runtimepath+=' . fnameescape(s:fzf_root)
+    runtime plugin/fzf.vim
+    nnoremap <leader>f :FZF<CR>
+    nnoremap <leader>b :buffers<CR>:buffer<Space>
+  endif
 endif
 
 " ripgrep integration when available.
