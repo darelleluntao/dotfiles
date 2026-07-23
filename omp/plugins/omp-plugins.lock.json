@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "@esso0428/pi-sidebar": {
+      "version": "0.1.35",
+      "enabledFeatures": null,
+      "enabled": true
+    }
+  },
+  "settings": {}
+}

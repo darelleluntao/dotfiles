@@ -21,6 +21,11 @@ copy_file "${HOME}/.config/nvim/init.vim" "${ROOT_DIR}/nvim/init.vim"
 copy_file "${HOME}/.config/nvim/lua/plugins.lua" "${ROOT_DIR}/nvim/lua/plugins.lua"
 copy_file "${HOME}/.config/nvim/lua/ide.lua" "${ROOT_DIR}/nvim/lua/ide.lua"
 copy_file "${HOME}/.config/nvim/lua/lsp.lua" "${ROOT_DIR}/nvim/lua/lsp.lua"
+copy_file "${HOME}/.config/herdr/config.toml" "${ROOT_DIR}/herdr/config.toml"
+copy_file "${HOME}/.config/herdr/scripts/label-panes.sh" "${ROOT_DIR}/herdr/scripts/label-panes.sh"
+copy_file "${HOME}/.config/herdr/scripts/send-all-panes.sh" "${ROOT_DIR}/herdr/scripts/send-all-panes.sh"
+copy_file "${HOME}/.omp/plugins/package.json" "${ROOT_DIR}/omp/plugins/package.json"
+copy_file "${HOME}/.omp/plugins/omp-plugins.lock.json" "${ROOT_DIR}/omp/plugins/omp-plugins.lock.json"
 copy_file "${HOME}/.gitignore_global" "${ROOT_DIR}/git/.gitignore_global"
 
 printf '\nReview git diff and run scripts/secret-scan.sh before committing.\n'

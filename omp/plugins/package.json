@@ -1,0 +1,7 @@
+{
+  "name": "omp-plugins",
+  "private": true,
+  "dependencies": {
+    "@esso0428/pi-sidebar": "^0.1.35"
+  }
+}

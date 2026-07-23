@@ -28,4 +28,7 @@ node_modules/
 claude/
 codex/
 cursor/
+# OMP runtime and generated install state
+.omp/
+omp/plugins/bun.lock
 opencode/

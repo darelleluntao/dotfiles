@@ -35,6 +35,11 @@ link_file "${ROOT_DIR}/nvim/init.vim" "${HOME}/.config/nvim/init.vim"
 link_file "${ROOT_DIR}/nvim/lua/plugins.lua" "${HOME}/.config/nvim/lua/plugins.lua"
 link_file "${ROOT_DIR}/nvim/lua/ide.lua" "${HOME}/.config/nvim/lua/ide.lua"
 link_file "${ROOT_DIR}/nvim/lua/lsp.lua" "${HOME}/.config/nvim/lua/lsp.lua"
+link_file "${ROOT_DIR}/herdr/config.toml" "${HOME}/.config/herdr/config.toml"
+link_file "${ROOT_DIR}/herdr/scripts/label-panes.sh" "${HOME}/.config/herdr/scripts/label-panes.sh"
+link_file "${ROOT_DIR}/herdr/scripts/send-all-panes.sh" "${HOME}/.config/herdr/scripts/send-all-panes.sh"
+link_file "${ROOT_DIR}/omp/plugins/package.json" "${HOME}/.omp/plugins/package.json"
+link_file "${ROOT_DIR}/omp/plugins/omp-plugins.lock.json" "${HOME}/.omp/plugins/omp-plugins.lock.json"
 link_file "${ROOT_DIR}/git/.gitignore_global" "${HOME}/.gitignore_global"
 
 if [[ ! -e "${HOME}/.gitconfig" ]]; then
