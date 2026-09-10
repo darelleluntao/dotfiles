@@ -65,7 +65,12 @@ zstyle ':completion:*:*:*:*:processes' command 'ps -u $USER -o pid,user,comm -w'
 
 plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
+# oh-my-zsh is installed separately (bundled with the Mac; see README's
+# headless-Linux section for the Linux commands). When it is absent, skip it
+# and degrade to a plain working zsh instead of erroring on every login.
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+  source "$ZSH/oh-my-zsh.sh"
+fi
 
 # zsh-autosuggestions and zsh-syntax-highlighting are brew-installed, source manually
 if command -v brew >/dev/null 2>&1; then
