@@ -1,31 +1,135 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Pull live config from this machine back into the repo.
+#
+# This is deliberately NOT a blind copy. The repo carries portability hardening
+# (guarded Homebrew detection, $HOME-relative paths, existence guards around
+# optional tools) that a live macOS file will not have. Copying live over repo
+# without review silently destroys those guards.
+#
+# So: this script shows every difference and requires confirmation before it
+# writes anything. Review each diff and only accept files where the live change
+# is a real preference, not a machine-specific regression.
+#
+# Flags:
+#   --dry-run    Show what differs and exit without writing.
+#   -y, --yes    Skip the confirmation prompt (for non-interactive use).
+#   -h, --help   Show this help.
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-copy_file() {
-  local source_path="$1"
-  local target_path="$2"
-  mkdir -p "$(dirname "${target_path}")"
-  cp -p "${source_path}" "${target_path}"
-  printf 'updated: %s\n' "${target_path}"
+usage() {
+  cat <<'EOF'
+Usage: ./update-dotfiles [--dry-run] [-y|--yes]
+
+Pull live config from this machine back into the repo. NOT a blind copy: it
+shows every difference and requires confirmation before writing, so the repo's
+portability guards cannot be wiped by one careless run.
+
+  --dry-run    Show what differs and exit without writing.
+  -y, --yes    Skip the confirmation prompt (for non-interactive use).
+  -h, --help   Show this help.
+EOF
 }
 
-copy_file "${HOME}/.zshrc" "${ROOT_DIR}/zsh/.zshrc"
-copy_file "${HOME}/.zprofile" "${ROOT_DIR}/zsh/.zprofile"
-copy_file "${HOME}/.p10k.zsh" "${ROOT_DIR}/zsh/.p10k.zsh"
-copy_file "${HOME}/.tmux.conf" "${ROOT_DIR}/tmux/.tmux.conf"
-copy_file "${HOME}/.vimrc" "${ROOT_DIR}/vim/.vimrc"
-copy_file "${HOME}/.vim/shared.vim" "${ROOT_DIR}/vim/.vim/shared.vim"
-copy_file "${HOME}/.config/nvim/init.vim" "${ROOT_DIR}/nvim/init.vim"
-copy_file "${HOME}/.config/nvim/lua/plugins.lua" "${ROOT_DIR}/nvim/lua/plugins.lua"
-copy_file "${HOME}/.config/nvim/lua/ide.lua" "${ROOT_DIR}/nvim/lua/ide.lua"
-copy_file "${HOME}/.config/nvim/lua/lsp.lua" "${ROOT_DIR}/nvim/lua/lsp.lua"
-copy_file "${HOME}/.config/herdr/config.toml" "${ROOT_DIR}/herdr/config.toml"
-copy_file "${HOME}/.config/herdr/scripts/label-panes.sh" "${ROOT_DIR}/herdr/scripts/label-panes.sh"
-copy_file "${HOME}/.config/herdr/scripts/send-all-panes.sh" "${ROOT_DIR}/herdr/scripts/send-all-panes.sh"
-copy_file "${HOME}/.omp/plugins/package.json" "${ROOT_DIR}/omp/plugins/package.json"
-copy_file "${HOME}/.omp/plugins/omp-plugins.lock.json" "${ROOT_DIR}/omp/plugins/omp-plugins.lock.json"
-copy_file "${HOME}/.gitignore_global" "${ROOT_DIR}/git/.gitignore_global"
+DRY_RUN=0
+ASSUME_YES=0
+for arg in "$@"; do
+  case "${arg}" in
+    --dry-run)  DRY_RUN=1 ;;
+    -y|--yes)   ASSUME_YES=1 ;;
+    -h|--help)  usage; exit 0 ;;
+    *) printf 'unknown argument: %s\n\n' "${arg}" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+# live path <TAB> repo path
+PAIRS=$(cat <<EOF
+${HOME}/.zshrc	${ROOT_DIR}/zsh/.zshrc
+${HOME}/.zprofile	${ROOT_DIR}/zsh/.zprofile
+${HOME}/.p10k.zsh	${ROOT_DIR}/zsh/.p10k.zsh
+${HOME}/.tmux.conf	${ROOT_DIR}/tmux/.tmux.conf
+${HOME}/.vimrc	${ROOT_DIR}/vim/.vimrc
+${HOME}/.vim/shared.vim	${ROOT_DIR}/vim/.vim/shared.vim
+${HOME}/.config/nvim/init.vim	${ROOT_DIR}/nvim/init.vim
+${HOME}/.config/nvim/lua/plugins.lua	${ROOT_DIR}/nvim/lua/plugins.lua
+${HOME}/.config/nvim/lua/ide.lua	${ROOT_DIR}/nvim/lua/ide.lua
+${HOME}/.config/nvim/lua/lsp.lua	${ROOT_DIR}/nvim/lua/lsp.lua
+${HOME}/.config/herdr/config.toml	${ROOT_DIR}/herdr/config.toml
+${HOME}/.config/herdr/scripts/label-panes.sh	${ROOT_DIR}/herdr/scripts/label-panes.sh
+${HOME}/.config/herdr/scripts/send-all-panes.sh	${ROOT_DIR}/herdr/scripts/send-all-panes.sh
+${HOME}/.omp/plugins/package.json	${ROOT_DIR}/omp/plugins/package.json
+${HOME}/.omp/plugins/omp-plugins.lock.json	${ROOT_DIR}/omp/plugins/omp-plugins.lock.json
+${HOME}/.gitignore_global	${ROOT_DIR}/git/.gitignore_global
+EOF
+)
+
+changed_live=()
+changed_repo=()
+missing=()
+
+while IFS=$'\t' read -r live repo; do
+  [[ -z "${live}" ]] && continue
+  if [[ ! -e "${live}" ]]; then
+    missing+=("${live}")
+    continue
+  fi
+  # A live file that is already a symlink into this repo is nothing to import.
+  if [[ "$(readlink "${live}" 2>/dev/null || true)" == "${repo}" ]]; then
+    continue
+  fi
+  if ! diff -q "${repo}" "${live}" >/dev/null 2>&1; then
+    changed_live+=("${live}")
+    changed_repo+=("${repo}")
+  fi
+done <<< "${PAIRS}"
+
+if [[ ${#missing[@]} -gt 0 ]]; then
+  printf 'Not present on this machine (skipped):\n'
+  printf '  %s\n' "${missing[@]}"
+  printf '\n'
+fi
+
+if [[ ${#changed_live[@]} -eq 0 ]]; then
+  printf 'Repo already matches this machine. Nothing to update.\n'
+  exit 0
+fi
+
+printf '=== %d file(s) differ. Review each diff below (< repo, > live) ===\n\n' "${#changed_live[@]}"
+for i in "${!changed_live[@]}"; do
+  printf -- '--- %s\n' "${changed_repo[$i]}"
+  diff -u "${changed_repo[$i]}" "${changed_live[$i]}" || true
+  printf '\n'
+done
+
+printf '!! Live macOS files may drop portability guards the repo relies on\n'
+printf '!! (Homebrew detection, $HOME paths, existence guards). Only accept\n'
+printf '!! changes that are genuine preferences.\n\n'
+
+if [[ "${DRY_RUN}" -eq 1 ]]; then
+  printf 'Dry run — no files written.\n'
+  exit 0
+fi
+
+if [[ "${ASSUME_YES}" -ne 1 ]]; then
+  if [[ ! -t 0 ]]; then
+    printf 'Refusing to overwrite repo files without a confirmation TTY.\n' >&2
+    printf 'Re-run interactively, or pass --yes if you have reviewed the diffs.\n' >&2
+    exit 1
+  fi
+  printf 'Overwrite these %d repo file(s) with the live versions? [y/N] ' "${#changed_live[@]}"
+  read -r reply
+  case "${reply}" in
+    y|Y|yes|YES) ;;
+    *) printf 'Aborted. No files written.\n'; exit 1 ;;
+  esac
+fi
+
+for i in "${!changed_live[@]}"; do
+  mkdir -p "$(dirname "${changed_repo[$i]}")"
+  cp -p "${changed_live[$i]}" "${changed_repo[$i]}"
+  printf 'updated: %s\n' "${changed_repo[$i]}"
+done
 
 printf '\nReview git diff and run scripts/secret-scan.sh before committing.\n'

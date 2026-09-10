@@ -16,31 +16,85 @@ This repo intentionally tracks reproducible configuration only. It does not trac
 - OMP plugin manifest and enabled-plugin lockfile (runtime state is excluded)
 - Backup-then-symlink installer
 
-## Install on a new machine
+## Install
 
 ```bash
 git clone https://github.com/darelleluntao/dotfiles.git ~/Developer/Personal/dotfiles
 cd ~/Developer/Personal/dotfiles
+./install.sh            # add --dry-run first to see exactly what it will do
+```
+
+`install.sh` backs up any existing target into `~/.dotfiles-backup/<timestamp>/`
+and replaces it with a symlink into the repo. It is idempotent: a target that
+already points at the repo is left untouched, so running it twice is safe. It
+detects the platform and skips anything that does not apply rather than failing.
+
+### macOS
+
+```bash
+./install.sh
+brew bundle --file Brewfile     # Homebrew packages (macOS only)
+```
+
+The Homebrew shell hook in `.zshrc` auto-detects Apple Silicon
+(`/opt/homebrew`) vs Intel (`/usr/local`) vs no Homebrew at all.
+
+### Headless Linux server
+
+`install.sh` runs as a non-root user and needs no `sudo`. It links the portable
+config (zsh, tmux, vim, Neovim, git, Herdr) and skips the macOS-only pieces:
+
+- Homebrew and the `Brewfile` are not used — install tools with the system
+  package manager instead (see below).
+- `~/.zprofile` and `~/.p10k.zsh` are linked only when `zsh` is on `PATH`.
+- OMP plugin manifests are linked only when `~/.omp` already exists.
+
+```bash
 ./install.sh
 ```
 
-The installer backs up existing files into `~/.dotfiles-backup/<timestamp>/` before creating symlinks.
-
-## Install Homebrew packages
+Then install the tools the config expects. Debian/Ubuntu example:
 
 ```bash
-brew bundle --file Brewfile
+sudo apt install git neovim tmux vim ripgrep fzf bat eza zoxide build-essential
 ```
+
+Minimum for a usable shell + editor: **git** and **Neovim ≥ 0.11** (the LSP
+layer uses `vim.lsp.config`/`vim.lsp.enable`; on an older Neovim that layer
+degrades to a plain editor with a warning instead of erroring).
+
+Neovim extras that need a toolchain at first launch:
+
+- **C compiler + make** — builds `telescope-fzf-native`; Treesitter parser
+  builds also use it (`build-essential` on Debian/Ubuntu).
+- **tree-sitter CLI** (optional) — only needed to build parsers not shipped as
+  pre-built grammars.
+
+Anything missing degrades gracefully: every Neovim layer is loaded with `pcall`,
+plugin setup is guarded with `pcall(require, ...)`, and `glow` markdown preview
+is enabled only when `glow` is on `PATH`.
+
+On first `nvim` launch, `lua/plugins.lua` bootstraps lazy.nvim by cloning it into
+`stdpath("data")`, then installs the plugin set. If `git` is missing it warns and
+skips rather than failing on every startup.
 
 ## Refresh repo from current machine
 
 ```bash
-./update-dotfiles
+./update-dotfiles              # shows a diff for every changed file, then asks
 ./scripts/secret-scan.sh
 git diff
 ```
 
-Only commit after reviewing the diff and confirming no machine secrets are present.
+`update-dotfiles` is **not** a blind copy. It prints a unified diff for each file
+that differs (`<` repo, `>` live) and requires an interactive `y` confirmation
+before it writes anything. Use `--dry-run` to review without writing, or `--yes`
+for non-interactive use once you have read the diffs. This guards against a live
+macOS file silently overwriting the repo's portability hardening (Homebrew
+detection, `$HOME`-relative paths, existence guards around optional tools).
+
+Only accept changes that are genuine preferences. Commit only after reviewing the
+diff and confirming no machine secrets are present.
 
 ## Manual post-install steps
 

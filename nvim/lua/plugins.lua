@@ -1,8 +1,32 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local uv = vim.uv or vim.loop
 
-if not vim.loop.fs_stat(lazypath) then
-  vim.notify("lazy.nvim is not installed at " .. lazypath, vim.log.levels.ERROR)
-  return
+-- Bootstrap lazy.nvim on first launch so a fresh machine (e.g. a bare server)
+-- comes up without a manual install step. If git is missing or the clone
+-- fails, degrade to a plain Neovim rather than erroring on every startup.
+if not uv.fs_stat(lazypath) then
+  if vim.fn.executable("git") == 0 then
+    vim.notify(
+      "lazy.nvim is not installed and git was not found in PATH; "
+        .. "install git, then restart Neovim to bootstrap plugins.",
+      vim.log.levels.WARN
+    )
+    return
+  end
+
+  vim.notify("Bootstrapping lazy.nvim ...", vim.log.levels.INFO)
+  local out = vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "--branch=stable",
+    "https://github.com/folke/lazy.nvim.git",
+    lazypath,
+  })
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Failed to clone lazy.nvim:\n" .. out, vim.log.levels.ERROR)
+    return
+  end
 end
 
 vim.opt.rtp:prepend(lazypath)

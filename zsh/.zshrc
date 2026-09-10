@@ -27,6 +27,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 export ANDROID_HOME="$HOME/Library/Android/sdk"
 export ANDROID_SDK_ROOT="$ANDROID_HOME"
 export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/tools"
+[[ -d "$ANDROID_HOME/build-tools/37.0.0" ]] && export PATH="$PATH:$ANDROID_HOME/build-tools/37.0.0"
 
 # .NET
 export PATH="/opt/homebrew/opt/dotnet@6/bin:$PATH"
