@@ -22,10 +22,16 @@ command = "bash $HOME/.config/herdr/scripts/label-panes.sh"
 type = "shell"
 description = "Label all panes with their short IDs"
 
+[[keys.command]]
+key = "prefix+e"
+command = "nvim ."
+type = "pane"
+description = "Open Neovim in current directory"
+
 [ui]
 show_agent_labels_on_pane_borders = true
 
-agent_panel_sort = "spaces"
+agent_panel_sort = "priority"
 [session]
 resume_agents_on_restore = true
 
@@ -33,5 +39,5 @@ resume_agents_on_restore = true
 delivery = "herdr"
 
 [theme]
-name = "gruvbox"
+name = "vesper"
 auto_switch = false
