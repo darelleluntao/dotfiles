@@ -59,6 +59,29 @@ Then install the tools the config expects. Debian/Ubuntu example:
 sudo apt install git neovim tmux vim ripgrep fzf bat eza zoxide build-essential
 ```
 
+#### oh-my-zsh + powerlevel10k (prompt)
+
+`.zshrc` loads oh-my-zsh and the powerlevel10k theme **only if they are already
+installed** — a box without them still gets a working zsh, just a plain prompt.
+`install.sh` does not bootstrap them (it only symlinks config, no network). To get
+the full prompt, run these once as your normal user (no `sudo`, unattended,
+idempotent — re-running is a no-op):
+
+```bash
+# oh-my-zsh (unattended: no shell change, no auto-launch)
+RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# powerlevel10k theme into oh-my-zsh's custom dir
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
+  "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" \
+  || git -C "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" pull
+```
+
+The repo's `~/.p10k.zsh` is already symlinked by `install.sh`, so the prompt
+picks up the captain's config on the next shell start. A Nerd Font in your
+terminal is needed for the glyphs to render.
+
 Minimum for a usable shell + editor: **git** and **Neovim ≥ 0.11** (the LSP
 layer uses `vim.lsp.config`/`vim.lsp.enable`; on an older Neovim that layer
 degrades to a plain editor with a warning instead of erroring).
